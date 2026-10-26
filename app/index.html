@@ -1,5 +1,149 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><title>It works</title></head>
-<body><h1>Vended from tmpl-webapp-bicep</h1><p>Replace app/ with the real application.</p></body>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#143c35">
+  <meta name="description" content="Your watts, made useful. Private, browser-based cycling zones, workouts, and ride estimates.">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Cycling Power AI — Your power lab</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='12' fill='%23143c35'/%3E%3Cpath d='M23 6 11 23h8l-2 11 13-18h-9z' fill='%23c5f277'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <svg class="icon-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <symbol id="i-bolt" viewBox="0 0 24 24"><path d="m14 2-9 12h7l-2 8 9-12h-7l2-8Z"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></symbol>
+    <symbol id="i-zones" viewBox="0 0 24 24"><path d="M4 20V10m5 10V4m6 16V8m5 12V2"/></symbol>
+    <symbol id="i-workout" viewBox="0 0 24 24"><path d="M2 18h4V9h4v6h4V5h4v13h4"/></symbol>
+    <symbol id="i-route" viewBox="0 0 24 24"><circle cx="5" cy="5" r="2"/><circle cx="19" cy="19" r="2"/><path d="M9 5h6a4 4 0 0 1 0 8H9a3 3 0 0 0 0 6h6"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="m12 3 8 3v6c0 5-8 9-8 9s-8-4-8-9V6l8-3Z"/><path d="m8 12 3 3 5-6"/></symbol>
+    <symbol id="i-mountain" viewBox="0 0 24 24"><path d="m2 20 7-12 4 6 3-10 6 16H2Zm5-9 2 3 2-3m3-1 2 3 2-3"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  </svg>
+
+  <aside class="sidebar" aria-label="App navigation">
+    <a class="brand" href="#overview" aria-label="Cycling Power AI home">
+      <span class="brand-mark"><svg class="icon"><use href="#i-bolt"/></svg></span>
+      <span>cycling<span class="brand-sub">POWER AI<span class="brand-dot">.</span></span></span>
+    </a>
+    <div class="sidebar-label">YOUR TRAINING TOOLKIT</div>
+    <nav class="navigation" aria-label="Main">
+      <a href="#overview" class="nav-link active" aria-current="location"><svg class="icon"><use href="#i-grid"/></svg>Overview</a>
+      <a href="#power-zones" class="nav-link"><svg class="icon"><use href="#i-zones"/></svg>Power zones</a>
+      <a href="#workout" class="nav-link"><svg class="icon"><use href="#i-workout"/></svg>Smart workout</a>
+      <a href="#ride" class="nav-link"><svg class="icon"><use href="#i-route"/></svg>Ride estimator</a>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="coming-soon"><span class="small-spark">✧</span> AI coach <span class="soon-tag">COMING SOON</span></div>
+      <div class="privacy-note"><svg class="icon"><use href="#i-shield"/></svg><div><strong>Your data stays yours.</strong><p>No account. No uploads.<br>Just you and your next ride.</p></div></div>
+      <span class="version">CYCLING POWER AI <span>v1.0</span></span>
+    </div>
+  </aside>
+
+  <main id="main" tabindex="-1">
+    <header class="page-header" id="overview">
+      <div><p class="eyebrow">THE POWER LAB</p><h1>Your training dashboard<span class="accent">.</span></h1></div>
+      <span class="local-badge"><span class="status-dot"></span>100% on your device</span>
+    </header>
+
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-copy"><span class="hero-eyebrow"><span class="mini-line"></span> LESS GUESSWORK. BETTER RIDING.</span><h2 id="hero-title">Make every<br><em>watt count.</em></h2><p>Know your zones. Build your session. Find your pace.</p><a class="hero-link" href="#workout">Plan today's ride <svg class="icon"><use href="#i-arrow"/></svg></a></div>
+      <svg class="hero-art" viewBox="0 0 600 280" fill="none" aria-hidden="true">
+        <defs><linearGradient id="road-glow" x1="280" y1="0" x2="480" y2="280" gradientUnits="userSpaceOnUse"><stop stop-color="#bfe982" stop-opacity=".05"/><stop offset="1" stop-color="#bfe982" stop-opacity=".22"/></linearGradient></defs>
+        <circle cx="395" cy="126" r="145" stroke="#bad8be" stroke-opacity=".09"/><circle cx="395" cy="126" r="110" stroke="#bad8be" stroke-opacity=".1"/><circle cx="395" cy="126" r="75" stroke="#bad8be" stroke-opacity=".12"/>
+        <path d="M20 210 110 139l60 36 98-101 81 73 65-49 167 104" stroke="#a5c5b1" stroke-opacity=".16"/><path d="M120 280c28-90 270-72 260-144-6-42-86-63-60-136h89c-39 62 75 101 45 163-27 57-139 79-147 117Z" fill="url(#road-glow)"/>
+        <path d="M120 280c28-90 270-72 260-144-6-42-86-63-60-136M307 280c8-38 120-60 147-117C484 101 370 62 409 0" stroke="#c5f277" stroke-opacity=".65" stroke-width="1.5"/>
+        <path d="M207 280c19-67 199-66 212-131 10-50-95-87-54-149" stroke="#d2ebbb" stroke-opacity=".45" stroke-dasharray="9 12"/>
+        <circle cx="420" cy="147" r="8" fill="#c5f277"/><circle cx="420" cy="147" r="15" stroke="#c5f277" stroke-opacity=".35"/><path d="m420 115 19-18h67" stroke="#c5f277" stroke-opacity=".5"/><text x="444" y="85" fill="#c5f277" font-size="11" letter-spacing="2">YOUR NEXT LEVEL</text>
+        <path d="M69 68h24m-12-12v24M514 237h16m-8-8v16" stroke="#bdd2bf" stroke-opacity=".3"/>
+      </svg>
+      <span class="hero-coordinate">BUILT FOR THE WAY YOU RIDE ↗</span>
+    </section>
+
+    <div class="overview-grid">
+      <section class="card profile-card" aria-labelledby="profile-title">
+        <div class="card-heading"><div><p class="eyebrow">01 / YOUR BASELINE</p><h2 id="profile-title">Rider profile</h2></div><span class="heading-icon"><svg class="icon"><use href="#i-bolt"/></svg></span></div>
+        <p class="section-intro">A few numbers. A more personal ride.</p>
+        <form id="profile-form" novalidate>
+          <div class="two-fields">
+            <div class="field"><label for="ftp">FTP <span class="label-hint">watts</span></label><div class="input-wrap"><input id="ftp" name="ftp" type="number" min="50" max="700" step="1" value="250" required inputmode="numeric" aria-describedby="ftp-error"><span class="input-unit">W</span></div><span class="field-error" id="ftp-error"></span></div>
+            <div class="field"><label for="weight">Body weight</label><div class="input-wrap"><input id="weight" name="weight" type="number" min="25" max="250" step="0.1" value="75" required inputmode="decimal" aria-describedby="weight-error"><span class="input-unit">kg</span></div><span class="field-error" id="weight-error"></span></div>
+          </div>
+          <div class="field"><label for="max-hr">Max heart rate <span class="optional">optional</span></label><div class="input-wrap"><input id="max-hr" name="maxHr" type="number" min="100" max="230" step="1" placeholder="e.g. 190" inputmode="numeric" aria-describedby="max-hr-error"><span class="input-unit">bpm</span></div><span class="field-error" id="max-hr-error"></span></div>
+        </form>
+        <div class="rider-insight" aria-live="polite" aria-atomic="true"><div><span class="metric-label">POWER TO WEIGHT</span><div class="power-weight"><strong id="power-weight">3.33</strong><span>W/kg</span></div></div><span class="category-pill" id="rider-category">Trained</span></div>
+        <details class="category-info"><summary>About rider categories</summary><p>Broad FTP bands inspired by Allen &amp; Coggan power-profiling charts: untrained &lt; 1.5, beginner 1.5–2.5, recreational 2.5–3, trained 3–4, advanced 4–5, elite 5–6, world class ≥ 6 W/kg. These simplified, non-gender-specific bands are not race rankings. Age, sex, and discipline affect competitive benchmarks.</p></details>
+        <p class="save-status" id="save-status" role="status"><span class="status-dot"></span>Profile saved on this device</p>
+
+        <details class="ftp-estimator" id="ftp-estimator">
+          <summary><span><svg class="icon"><use href="#i-bolt"/></svg>Find your FTP</span><span class="summary-plus" aria-hidden="true">+</span></summary>
+          <div class="details-body"><p class="muted">Start with a recent, maximal test.</p><form id="ftp-test-form" novalidate>
+            <fieldset class="segmented test-options"><legend class="sr-only">Test type</legend><label><input type="radio" name="test-type" value="20min" checked><span>20-minute test</span></label><label><input type="radio" name="test-type" value="ramp"><span>Ramp test</span></label></fieldset>
+            <div class="field"><label for="test-power" id="test-power-label">20-minute average power</label><div class="input-wrap"><input id="test-power" type="number" min="50" max="1500" step="1" value="265" required inputmode="numeric" aria-describedby="test-power-error test-formula"><span class="input-unit">W</span></div><span class="field-error" id="test-power-error"></span></div>
+            <p class="muted small" id="test-formula">Estimated FTP = 95% of 20-minute average power.</p>
+            <div class="estimate-result"><span>Estimated FTP <strong id="estimated-ftp">252 W</strong></span><button class="button button-small" type="submit">Use estimate <svg class="icon"><use href="#i-arrow"/></svg></button></div>
+            <p id="test-status" class="small muted" role="status"></p>
+          </form></div>
+        </details>
+      </section>
+
+      <section class="card zones-card" id="power-zones" aria-labelledby="zones-title">
+        <div class="card-heading"><div><p class="eyebrow">02 / FIND YOUR RANGE</p><h2 id="zones-title">Your power zones</h2></div><span class="subtle-badge">COGGAN · 7 ZONES</span></div>
+        <p class="section-intro">The right intensity for every kind of ride.</p>
+        <p class="sr-only" id="zone-status" role="status"></p>
+        <div class="zones-table-wrap"><table class="zones-table"><caption class="sr-only">Coggan power zones based on your FTP</caption><thead><tr><th scope="col">ZONE / FOCUS</th><th scope="col">% FTP</th><th scope="col" class="align-right">POWER</th></tr></thead><tbody id="zones-body"></tbody></table></div>
+        <p class="table-note">Whole-watt boundaries are rounded down, with no gaps between zones.</p>
+        <div id="hr-zones" class="hr-zones" hidden><h3>Heart-rate guide <span>% of max HR</span></h3><div class="hr-grid" id="hr-grid"></div><p class="table-note">General 5-zone guide (50–100% max HR), not Coggan zones or a direct match to power.</p></div>
+        <div class="zones-footer"><svg class="icon"><use href="#i-zones"/></svg><span id="zones-footer">Based on your 250 W FTP. Updates as you do.</span></div>
+      </section>
+    </div>
+
+    <section class="card workout-card" id="workout" aria-labelledby="workout-title">
+      <div class="card-heading"><div><p class="eyebrow">03 / TRAIN WITH INTENTION</p><h2 id="workout-title">Smart suggestion<span class="tiny-tag">RULE-BASED</span></h2></div><svg class="icon section-icon"><use href="#i-workout"/></svg></div>
+      <p class="section-intro">Your goal, your time, your watts. No AI involved.</p>
+      <form id="workout-form" class="workout-controls" novalidate>
+        <fieldset class="goal-fieldset"><legend>What are you training for?</legend><div class="segmented goals"><label><input type="radio" name="goal" value="endurance"><span>Endurance</span></label><label><input type="radio" name="goal" value="threshold" checked><span>Threshold</span></label><label><input type="radio" name="goal" value="vo2max"><span>VO₂max</span></label><label><input type="radio" name="goal" value="recovery"><span>Recovery</span></label></div></fieldset>
+        <div class="time-control"><label for="workout-time">Time available <output id="time-output" for="workout-time">60 min</output></label><input type="range" id="workout-time" min="30" max="120" step="5" value="60"><div class="range-labels"><span>30 min</span><span>120 min</span></div></div>
+        <button class="button" type="submit">Build my workout <svg class="icon"><use href="#i-arrow"/></svg></button>
+      </form>
+      <p class="workout-status" id="workout-status" role="status"></p>
+      <div id="workout-result">
+        <div class="workout-result-heading"><div><span class="eyebrow" id="workout-kicker">STEADY WORK. STRONGER LEGS.</span><h3 id="workout-name">Threshold builder</h3><p id="workout-description" class="muted"></p></div><div class="workout-metrics"><div><strong id="workout-duration">60<span> min</span></strong><span>Total time</span></div><div><strong id="workout-average">—</strong><span>Avg. target</span></div></div></div>
+        <div class="chart-wrap"><svg id="workout-chart" viewBox="0 0 1000 230" role="img" aria-labelledby="chart-title chart-description"><title id="chart-title">Workout power over time</title><desc id="chart-description"></desc></svg></div>
+        <div class="chart-legend"><span><i class="legend-dot warm-color"></i>Warm-up / cool-down</span><span><i class="legend-dot work-color"></i>Work</span><span><i class="legend-dot rest-color"></i>Recovery</span><span class="ftp-key">- - FTP</span></div>
+        <details class="workout-steps"><summary>View workout steps <span id="step-count" class="subtle-badge"></span></summary><ol id="workout-steps"></ol></details>
+        <p class="table-note">Power targets are based on your FTP. Start rested, adjust to how you feel, and stop if you feel unwell.</p>
+      </div>
+    </section>
+
+    <section class="card ride-card" id="ride" aria-labelledby="ride-title">
+      <div class="card-heading"><div><p class="eyebrow">04 / SEE THE ROAD AHEAD</p><h2 id="ride-title">Ride estimator</h2></div><svg class="icon section-icon"><use href="#i-route"/></svg></div>
+      <p class="section-intro">A little physics. A useful starting point.</p>
+      <div class="ride-layout">
+        <form id="ride-form" novalidate>
+          <div class="ride-fields">
+            <div class="field"><label for="distance">Distance</label><div class="input-wrap"><input id="distance" type="number" min="1" max="500" step="0.1" value="60" required inputmode="decimal" aria-describedby="distance-error"><span class="input-unit">km</span></div><span class="field-error" id="distance-error"></span></div>
+            <div class="field"><label for="elevation">Elevation gain</label><div class="input-wrap"><input id="elevation" type="number" min="0" max="15000" step="1" value="600" required inputmode="numeric" aria-describedby="elevation-error"><span class="input-unit">m</span></div><span class="field-error" id="elevation-error"></span></div>
+            <div class="field"><label for="ride-power">Steady power</label><div class="input-wrap"><input id="ride-power" type="number" min="25" max="700" step="1" value="180" required inputmode="numeric" aria-describedby="ride-power-error"><span class="input-unit">W</span></div><span class="field-error" id="ride-power-error"></span></div>
+          </div>
+          <details class="assumptions" open><summary>Model assumptions <span class="muted">Tune your setup</span></summary><div class="assumption-fields">
+            <div class="field"><label for="cda">Drag area (CdA)</label><div class="input-wrap"><input id="cda" type="number" min="0.15" max="0.8" step="0.01" value="0.32" required inputmode="decimal" aria-describedby="cda-error"><span class="input-unit">m²</span></div><span class="field-error" id="cda-error"></span></div>
+            <div class="field"><label for="crr">Rolling resistance</label><div class="input-wrap"><input id="crr" type="number" min="0.001" max="0.02" step="0.001" value="0.005" required inputmode="decimal" aria-describedby="crr-error"></div><span class="field-error" id="crr-error"></span></div>
+            <div class="field"><label for="bike-weight">Bike + gear</label><div class="input-wrap"><input id="bike-weight" type="number" min="4" max="40" step="0.1" value="8.5" required inputmode="decimal" aria-describedby="bike-weight-error"><span class="input-unit">kg</span></div><span class="field-error" id="bike-weight-error"></span></div>
+          </div><p class="model-note">Still air, air density 1.225 kg/m³, 97% drivetrain efficiency. Uses your profile weight. All climbing is spread evenly over the distance; no descents, stops, or wind. Real-world averages will vary.</p></details>
+          <p class="model-note formula">Power at wheel = (aerodynamic drag + rolling resistance + gravity) × speed.</p>
+        </form>
+        <div class="ride-result" aria-live="polite" aria-atomic="true"><div class="ride-result-top"><span class="eyebrow">YOUR ESTIMATED RIDE</span><svg class="icon"><use href="#i-route"/></svg></div><div class="speed-metric"><strong id="ride-speed">—</strong><span>km/h</span></div><p class="speed-label">Estimated average speed</p><div class="ride-divider"></div><div class="ride-time"><svg class="icon"><use href="#i-clock"/></svg><div><strong id="ride-time">—</strong><span>Estimated moving time</span></div></div><p class="ride-result-note" id="ride-result-note">A steady-effort estimate, not a route forecast.</p></div>
+      </div>
+    </section>
+
+    <footer class="page-footer"><span class="footer-brand"><svg class="icon"><use href="#i-bolt"/></svg> A little more insight. A better ride.</span><span>Built for cyclists. Private by design.</span></footer>
+    <noscript><p class="noscript-note">Enable JavaScript to calculate your zones, workouts, and ride estimates. All calculations run on your device.</p></noscript>
+  </main>
+</body>
 </html>
