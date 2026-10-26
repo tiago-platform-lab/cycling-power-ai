@@ -1,4 +1,4 @@
-# Placeholder: vending overwrites this file with the owning team from
-# projects/<app>.yaml (and the platform team on infra/) when the repo is created.
-* @tiago-platform-lab/TODO-app-team
-/infra/ @tiago-platform-lab/TODO-app-team @tiago-platform-lab/platform-team
+# Written by vending from projects/cycling-power-ai.yaml: the owning team reviews
+# everything, the platform team also reviews infra/.
+* @tiago-platform-lab/ai-delivery-team
+/infra/ @tiago-platform-lab/ai-delivery-team @tiago-platform-lab/platform-team
