@@ -1,0 +1,103 @@
+# tmpl-webapp-bicep
+
+Template for a team app on Azure Container Apps. Vending creates each app repo from
+it and starts the first deploy, so a new repo runs the placeholder in `app/` in dev
+right away. In this template repo itself the deploy and what-if workflows are
+skipped (no `APP_NAME`).
+
+How the whole platform works: [platform overview](https://github.com/tiago-platform-lab/platform-vending/blob/main/docs/README.md).
+
+## What `infra/main.bicep` creates
+
+Inside `rg-<app>-<env>`:
+
+| Resource | Default | Switch |
+|---|---|---|
+| Container App `ca-<app>-<env>` | on | |
+| Key Vault `kv-<app>-<env>` (RBAC) | on | |
+| Storage account + queue `jobs` (identity only) | off | `enableStorage` |
+| Worker Container App, same image, no ingress | off | `enableWorker` |
+| Postgres Flexible Server, Entra-only | off | `enablePostgres` |
+
+It references, never creates: the department's Container Apps environment and
+registry (platform-shared) and the runtime identity (vending).
+
+The app runs as `id-<app>-<env>-runtime`. It reads secrets from Key Vault and
+storage by identity; there are no passwords in the app or the pipeline. Its roles
+were granted by vending; this repo cannot grant roles. If the app needs another
+one (for example on an AI service), ask for it through its `projects/<app>.yaml`.
+
+## Who owns what
+
+`infra/main.bicep` owns every property of the app: sizing, scale, env vars. The
+only thing passed in at deploy time is the image tag. Do not set those properties
+anywhere else (portal, `az containerapp update`), or the next deploy puts them back.
+
+## Pipelines
+
+| Workflow | When | Runs as |
+|---|---|---|
+| `ci.yml` | every PR and push | no Azure access |
+| `infra-plan.yml` | PRs touching `infra/`, the workflow or `.github/actions/` | plan identity (What-If Reader) |
+| `deploy-dev.yml` | push to `main` | dev deploy identity: build `<app>:<sha>` on the runner, push, deploy to dev |
+| `blast-radius.yml` | every PR | plan identity (what-if JSON), then no Azure access: rules + LLM, one PR comment |
+| `release.yml` | tag `vX.Y.Z` (a published release) | dev identity names the tested image `<app>:vX.Y.Z`; prod identity deploys it after approval |
+
+### Releasing to prod
+
+Every merge reaches dev. Prod only gets versions:
+
+1. **Releases** → **Draft a new release** → tag `v1.2.3` on `main` → **Publish release**
+   (or `git tag v1.2.3 && git push origin v1.2.3`).
+2. `release.yml` checks the tag is `vX.Y.Z` on a commit of `main` that was deployed
+   to dev, and adds the version to that same image in the registry (no rebuild).
+   A version never moves: reusing a tag for another image fails.
+3. Approve the `prod` deployment. Prod runs `<registry>/<app>:v1.2.3`.
+
+Release tags are protected: only the owning team can create them, and nobody can
+move or delete them.
+
+Rollback: dev, run **deploy-dev** by hand with `image-tag` set to an earlier commit
+SHA; prod, run **release** on an earlier tag (`gh workflow run release.yml --ref v1.2.2`).
+
+Actions are pinned by commit SHA; Dependabot keeps them up to date.
+
+Every Azure login goes through `.github/actions/azure-login`: a full OIDC login,
+repeated with a fresh token and a growing delay (up to 10 minutes) until the
+identity can use the subscription.
+New role assignments take minutes to take effect, e.g. on the first deploy right
+after vending; without the wait that deploy would fail with "No subscriptions found".
+
+## Variables
+
+All set by vending; nothing to edit after the repo is created. `infra/*.bicepparam`
+read them with `readEnvironmentVariable`.
+
+## Make it yours
+
+1. Replace `app/` with the real app (keep port 8080 or change `targetPort`).
+2. Turn on what you need in `infra/main.<env>.bicepparam`.
+3. Add the app's tests to `ci.yml` and its ecosystem to `dependabot.yml`.
+
+`.github/CODEOWNERS` is written by vending with the owning team (and the platform
+team on `infra/`); change it through a pull request if ownership changes.
+
+## Blast radius bot
+
+Every pull request gets one comment, updated on each push, with its risk level
+(low, medium, high, critical), from `.github/workflows/blast-radius.yml`:
+
+1. **Rules (deterministic)** on the what-if of dev and prod and on the changed files: a Key Vault,
+   storage account, database or Log Analytics deleted or modified, identities or roles touched,
+   ingress/scale/identity of the Container App changed, a stateful resource removed from the Bicep
+   (incremental deployments leave it in Azure, unmanaged), pipeline or CODEOWNERS changes.
+   Known what-if noise (properties Azure fills in, values from `reference()`) is ignored.
+2. **LLM (OpenAI)** reads the diff and the rule findings: removed or changed endpoints, data,
+   security, config, and real code problems; writes the summary, rollback and reviewer checklist.
+
+The final level is the higher of the two: the LLM can raise it, never lower it below the rules,
+because the PR itself could try to talk it down. The analysis scripts are taken from the target
+branch, so a PR cannot change the rules that judge it. Needs the org secret `OPENAI_API_KEY` and
+the variable `OPENAI_MODEL` (optional: `OPENAI_REASONING_EFFORT`, e.g. `medium`); without them only
+the rules run. Code is sent to OpenAI: check this
+is allowed for the repo (Azure OpenAI with the app's identity is the alternative).

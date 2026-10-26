@@ -1,0 +1,75 @@
+name: deploy-dev
+
+# Every merge to main: build the image once, as <app>:<commit sha>, and deploy
+# it to dev. Prod is a separate decision: publishing a vX.Y.Z release runs
+# release.yml, which promotes this same image (no rebuild) after approval.
+#
+# Rollback in dev: run this workflow by hand with image-tag set to an earlier
+# commit SHA. The build is skipped and that tag is redeployed.
+#
+# Infra and image deploy together: the Bicep owns the whole app and the image
+# tag is just one of its parameters, so there is one way to change the app.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      image-tag:
+        description: 'Redeploy an existing tag (rollback). Leave empty to build from this commit.'
+        required: false
+        default: ''
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: deploy-dev
+  cancel-in-progress: false
+
+env:
+  APP_NAME: ${{ vars.APP_NAME }}
+  ACR_LOGIN_SERVER: ${{ vars.ACR_LOGIN_SERVER }}
+  IDENTITY_RG: ${{ vars.IDENTITY_RG }}
+  IMAGE_TAG: ${{ inputs.image-tag || github.sha }}
+  TAG_DEPT: ${{ vars.TAG_DEPT }}
+  TAG_OWNER: ${{ vars.TAG_OWNER }}
+  TAG_COST_CENTRE: ${{ vars.TAG_COST_CENTRE }}
+
+jobs:
+  dev:
+    # APP_NAME is set by the vending workflow; the template repo itself has
+    # none and never deploys.
+    if: vars.APP_NAME != ''
+    runs-on: ubuntu-latest
+    environment: dev
+    env:
+      PLATFORM_RG: ${{ vars.PLATFORM_RG }}
+      CAE_NAME: ${{ vars.CAE_NAME }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/azure-login # OIDC login + wait for RBAC propagation
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      - name: Build and push image
+        if: inputs.image-tag == ''
+        # Only the dev deploy identity holds AcrPush. Built on the runner rather
+        # than with `az acr build`: ACR Tasks need more than AcrPush and are not
+        # available on free/trial subscriptions. Logging in by login server
+        # skips the ARM lookup of the registry, which AcrPush cannot read.
+        run: |
+          az acr login --name "$ACR_LOGIN_SERVER"
+          docker build -t "${ACR_LOGIN_SERVER}/${APP_NAME}:${IMAGE_TAG}" app/
+          docker push "${ACR_LOGIN_SERVER}/${APP_NAME}:${IMAGE_TAG}"
+      - name: Deploy
+        run: |
+          az deployment group create \
+            --name "app-${{ github.run_id }}" \
+            --resource-group "${{ vars.RESOURCE_GROUP }}" \
+            --template-file infra/main.bicep \
+            --parameters infra/main.dev.bicepparam \
+            --query properties.outputs.url.value -o tsv
+      # TODO: smoke test the returned URL before moving on.
